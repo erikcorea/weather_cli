@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
 
@@ -37,6 +38,10 @@ type Weather struct {
 }
 
 func main() {
+	q := "nyc"
+	if (len(os.Args)) >= 2 {
+		q = os.Args[1]
+	}
 
 	err := godotenv.Load()
 	if err != nil {
@@ -44,7 +49,7 @@ func main() {
 	}
 
 	apiKey := os.Getenv("WEATHER_API_KEY")
-	url := fmt.Sprintf("http://api.weatherapi.com/v1/forecast.json?key=%s&q=nyc&days=1&aqi=no&alerts=no", apiKey)
+	url := fmt.Sprintf("http://api.weatherapi.com/v1/forecast.json?key=%s&q="+q+"&days=1&aqi=no&alerts=no", apiKey)
 	res, err := http.Get(url)
 	if err != nil {
 		panic(err)
@@ -80,11 +85,17 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("%s - %.0fF, %.0f, %s\n",
+		message := fmt.Sprintf("%s - %.0fF, %.0f, %s\n",
 			date.Format("15:04"),
 			hour.TempF,
 			hour.ChanceOfRain,
 			hour.Condition.Text,
 		)
+
+		if hour.ChanceOfRain < 40 {
+			fmt.Print(message)
+		} else {
+			color.Red(message)
+		}
 	}
 }
