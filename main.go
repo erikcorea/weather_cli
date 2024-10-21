@@ -43,7 +43,7 @@ func main() {
 		fmt.Println("Error loading .env file")
 	}
 
-	apiKey := os.Getenv("API_KEY")
+	apiKey := os.Getenv("WEATHER_API_KEY")
 	url := fmt.Sprintf("http://api.weatherapi.com/v1/forecast.json?key=%s&q=nyc&days=1&aqi=no&alerts=no", apiKey)
 	res, err := http.Get(url)
 	if err != nil {
@@ -75,6 +75,11 @@ func main() {
 
 	for _, hour := range hours {
 		date := time.Unix(hour.TimeEpoch, 0)
+
+		if date.Before(time.Now()) {
+			continue
+		}
+
 		fmt.Printf("%s - %.0fF, %.0f, %s\n",
 			date.Format("15:04"),
 			hour.TempF,
